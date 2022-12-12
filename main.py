@@ -77,8 +77,9 @@ class AutoCrawler:
         self.no_gui = no_gui
         self.limit = limit
         self.proxy_list = proxy_list if proxy_list and len(proxy_list) > 0 else None
+        if not os.path.exists(self.download_path):
+            os.makedirs(self.download_path)
 
-        os.makedirs('./{}'.format(self.download_path), exist_ok=True)
 
     @staticmethod
     def all_dirs(path):
@@ -341,17 +342,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--skip', type=str, default='true',
                         help='Skips keyword already downloaded before. This is needed when re-downloading.')
-    parser.add_argument('--threads', type=int, default=4, help='Number of threads to download.')
+    parser.add_argument('--threads', type=int, default=1, help='Number of threads to download.')
     parser.add_argument('--google', type=str, default='true', help='Download from google.com (boolean)')
-    parser.add_argument('--naver', type=str, default='true', help='Download from naver.com (boolean)')
-    parser.add_argument('--full', type=str, default='false',
+    parser.add_argument('--naver', type=str, default='false', help='Download from naver.com (boolean)')
+    parser.add_argument('--full', type=str, default='true',
                         help='Download full resolution image instead of thumbnails (slow)')
-    parser.add_argument('--face', type=str, default='false', help='Face search mode')
-    parser.add_argument('--no_gui', type=str, default='auto',
+    parser.add_argument('--face', type=str, default='true', help='Face search mode')
+    parser.add_argument('--no_gui', type=str, default='false',
                         help='No GUI mode. Acceleration for full_resolution mode. '
                              'But unstable on thumbnail mode. '
                              'Default: "auto" - false if full=false, true if full=true')
-    parser.add_argument('--limit', type=int, default=0,
+    parser.add_argument('--limit', type=int, default=10,
                         help='Maximum count of images to download per site. (0: infinite)')
     parser.add_argument('--proxy-list', type=str, default='',
                         help='The comma separated proxy list like: "socks://127.0.0.1:1080,http://127.0.0.1:1081". '
@@ -367,6 +368,9 @@ if __name__ == '__main__':
     _limit = int(args.limit)
     _proxy_list = args.proxy_list.split(',')
 
+    _limit = 2000
+
+
     no_gui_input = str(args.no_gui).lower()
     if no_gui_input == 'auto':
         _no_gui = _full
@@ -379,7 +383,9 @@ if __name__ == '__main__':
         'Options - skip:{}, threads:{}, google:{}, naver:{}, full_resolution:{}, face:{}, no_gui:{}, limit:{}, _proxy_list:{}'
             .format(_skip, _threads, _google, _naver, _full, _face, _no_gui, _limit, _proxy_list))
 
+    saved_path = '/home/steven/dataset/crawled_images/'
+
     crawler = AutoCrawler(skip_already_exist=_skip, n_threads=_threads,
-                          do_google=_google, do_naver=_naver, full_resolution=_full,
+                          do_google=_google, do_naver=_naver, download_path=saved_path,full_resolution=_full,
                           face=_face, no_gui=_no_gui, limit=_limit, proxy_list=_proxy_list)
     crawler.do_crawling()
