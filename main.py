@@ -367,7 +367,7 @@ if __name__ == '__main__':
     _limit = int(args.limit)
     _proxy_list = args.proxy_list.split(',')
 
-    _limit = 2000
+    _limit = 0
 
 
     no_gui_input = str(args.no_gui).lower()

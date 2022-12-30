@@ -254,7 +254,12 @@ class CollectLinks:
                 last_scroll = scroll
 
             if scroll_patience >= 30:  # 如果连续30次，都没有滚动页面，那么就证明没有更多图片了，所以就break了，应该是这个意思
-                break
+                time.sleep(3)
+                have_more = self.load_more_images()
+                if have_more:
+                    scroll_patience = 0  # 如果有更多图片，那么这里应该轻0
+                if not have_more or scroll_patience >= 40:
+                    break
 
             elem.send_keys(Keys.RIGHT)
 
@@ -264,6 +269,39 @@ class CollectLinks:
         self.browser.close()
 
         return links
+
+    def load_more_images(self):
+        # load more images as many as possible
+        # scrolling to bottom
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+        # get button
+        show_more_button = self.browser.find_element(By.CSS_SELECTOR, "input[value='显示更多搜索结果']")
+        try:
+            while True:
+                # do according to message
+                message = self.browser.find_element(By.CSS_SELECTOR, 'div.OuJzKb.Bqq24e').get_attribute('textContent')
+                print(message)
+                if message == '正在加载更多内容，请稍候':
+                    time.sleep(5)
+                    # self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+                elif message == '新内容已成功加载。向下滚动即可查看更多内容。':
+                    # scrolling to bottom
+                    # self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+                    if show_more_button.is_displayed():
+                        show_more_button.click()
+                    return True
+                elif message == '看来您已经看完了所有内容':
+                    return False
+                elif message == '无法加载更多内容，点击即可重试。':
+                    show_more_button.click()
+                else:
+                    pass
+                    # self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+        except Exception as err:
+            print(err)
+            return False
+
+        return True
 
     def naver_full(self, keyword, add_url=""):
         print('[Full Resolution Mode]')
