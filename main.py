@@ -80,7 +80,6 @@ class AutoCrawler:
         if not os.path.exists(self.download_path):
             os.makedirs(self.download_path)
 
-
     @staticmethod
     def all_dirs(path):
         paths = []
@@ -347,7 +346,7 @@ if __name__ == '__main__':
     parser.add_argument('--naver', type=str, default='false', help='Download from naver.com (boolean)')
     parser.add_argument('--full', type=str, default='true',
                         help='Download full resolution image instead of thumbnails (slow)')
-    parser.add_argument('--face', type=str, default='true', help='Face search mode')
+    parser.add_argument('--face', type=str, default='false', help='Face search mode')
     parser.add_argument('--no_gui', type=str, default='false',
                         help='No GUI mode. Acceleration for full_resolution mode. '
                              'But unstable on thumbnail mode. '
@@ -381,11 +380,11 @@ if __name__ == '__main__':
 
     print(
         'Options - skip:{}, threads:{}, google:{}, naver:{}, full_resolution:{}, face:{}, no_gui:{}, limit:{}, _proxy_list:{}'
-            .format(_skip, _threads, _google, _naver, _full, _face, _no_gui, _limit, _proxy_list))
+        .format(_skip, _threads, _google, _naver, _full, _face, _no_gui, _limit, _proxy_list))
 
-    saved_path = '/home/steven/dataset/crawled_images/'
+    saved_path = '/home/wangyu/dataset/crawled_images/'
 
     crawler = AutoCrawler(skip_already_exist=_skip, n_threads=_threads,
-                          do_google=_google, do_naver=_naver, download_path=saved_path,full_resolution=_full,
+                          do_google=_google, do_naver=_naver, download_path=saved_path, full_resolution=_full,
                           face=_face, no_gui=_no_gui, limit=_limit, proxy_list=_proxy_list)
     crawler.do_crawling()

@@ -253,7 +253,7 @@ class CollectLinks:
                 scroll_patience = 0
                 last_scroll = scroll
 
-            if scroll_patience >= 30:
+            if scroll_patience >= 30:  # 如果连续30次，都没有滚动页面，那么就证明没有更多图片了，所以就break了，应该是这个意思
                 break
 
             elem.send_keys(Keys.RIGHT)
