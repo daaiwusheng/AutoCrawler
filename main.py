@@ -15,6 +15,8 @@ Copyright 2018 YoongiKim
 """
 
 import os
+import time
+
 import requests
 import shutil
 from multiprocessing import Pool
@@ -24,7 +26,10 @@ import imghdr
 import base64
 from pathlib import Path
 import random
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
+from fake_useragent import UserAgent
 
 class Sites:
     GOOGLE = 1
@@ -156,6 +161,8 @@ class AutoCrawler:
                     shutil.copyfileobj(object.raw, file)
         except Exception as e:
             print('Save failed - {}'.format(e))
+        finally:
+            file.close()
 
     @staticmethod
     def base64_to_object(src):
@@ -172,6 +179,7 @@ class AutoCrawler:
             max_count = total
 
         for index, link in enumerate(links):
+            time.sleep(1)
             if success_count >= max_count:
                 break
 
@@ -187,7 +195,11 @@ class AutoCrawler:
                     ext = 'png'
                     is_base64 = True
                 else:
-                    response = requests.get(link, stream=True)
+                    ua = UserAgent(browsers=['chrome'])
+                    headers = {
+                        'User-Agent': ua.random
+                    }
+                    response = requests.get(link, headers=headers, stream=True)
                     ext = self.get_extension_from_link(link)
                     is_base64 = False
 
@@ -209,7 +221,9 @@ class AutoCrawler:
                         path2 = no_ext_path + '.' + ext2
                         os.rename(path, path2)
                         print('Renamed extension {} -> {}'.format(ext, ext2))
-
+            except requests.exceptions.ConnectionError as error:
+                print(error)
+                time.sleep(5)
             except Exception as e:
                 print('Download failed - ', e)
                 continue

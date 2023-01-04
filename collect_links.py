@@ -231,7 +231,7 @@ class CollectLinks:
 
                 # Wait for image to load. If not it will display base64 code.
                 while str(loading_bar.get_attribute('style')) != 'display: none;':
-                    time.sleep(0.1)
+                    time.sleep(0.5)
 
                 src = img.get_attribute('src')
 
@@ -245,6 +245,7 @@ class CollectLinks:
                 pass
             except Exception as e:
                 print('[Exception occurred while collecting links from google_full] {}'.format(e))
+                break
 
             scroll = self.get_scroll()
             if scroll == last_scroll:
@@ -257,9 +258,12 @@ class CollectLinks:
                 time.sleep(3)
                 have_more = self.load_more_images()
                 if have_more:
-                    scroll_patience = 0  # 如果有更多图片，那么这里应该轻0
+                    scroll_patience = 0  # 如果有更多图片，那么这里应该 set as 0
                 if not have_more or scroll_patience >= 40:
                     break
+            # test code
+            if len(links) > 30:
+                break
 
             elem.send_keys(Keys.RIGHT)
 
@@ -289,13 +293,15 @@ class CollectLinks:
                     # self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight)")
                     if show_more_button.is_displayed():
                         show_more_button.click()
+                        time.sleep(1)
                     return True
                 elif message == '看来您已经看完了所有内容':
                     return False
                 elif message == '无法加载更多内容，点击即可重试。':
                     show_more_button.click()
+                    time.sleep(1)
                 else:
-                    pass
+                    return False   # 应该是都加载完了
                     # self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight)")
         except Exception as err:
             print(err)
